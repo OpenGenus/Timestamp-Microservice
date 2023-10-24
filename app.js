@@ -19,8 +19,23 @@ app.get("/api/:date?", (req, res) => {
     // Check if date_string is a Unix timestamp in milliseconds
     date = new Date(parseInt(date_string));
   } else {
-    // Assume date_string is a date in the format "YYYY-MM-DD"
+    // Attempt to parse the date
     date = new Date(date_string);
+    
+    // Check if the parsed date corresponds to the input
+    const inputDate = date_string.split('-').map(Number); // Split the input date string
+    const parsedYear = date.getFullYear();
+    const parsedMonth = date.getMonth() + 1; // JavaScript months are 0-based
+
+    if (
+      inputDate[0] !== parsedYear ||
+      inputDate[1] !== parsedMonth ||
+      inputDate[2] !== date.getDate()
+    ) {
+      // The parsed date does not match the input, so it's invalid
+      res.json({ error: "Invalid Date" });
+      return;
+    }
   }
 
   if (!isNaN(date)) {
